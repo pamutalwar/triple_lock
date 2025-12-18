@@ -86,7 +86,7 @@ spec:
     spec:
       containers:
       - name: springboot
-        image: your-dockerhub-username/springboot:latest  # Replace with your image
+        image: pamutalwar/springboot:latest  # Replace with your image
         ports:
         - containerPort: 8080
         envFrom:

@@ -2,14 +2,14 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_IMAGE = 'your-dockerhub-username/springboot'
+        DOCKER_IMAGE = 'pamutalwar/springboot'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
     }
     
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-username/your-repo.git'
+                git branch: 'main', url: 'https://github.com/pamutalwar/triple_lock.git'
             }
         }
         
