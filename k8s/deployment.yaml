@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: springboot-config
+data:
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/triple"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  SPRING_JPA_SHOW_SQL: "true"
+  SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.MySQL8Dialect"
+  SPRING_THYMELEAF_CACHE: "false"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: springboot-secret
+type: Opaque
+data:
+  SPRING_DATASOURCE_USERNAME: cm9vdA==  # base64 encoded 'root'
+  SPRING_DATASOURCE_PASSWORD: YWRtaW4=  # base64 encoded 'admin'
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  serviceName: mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "admin"
+        - name: MYSQL_DATABASE
+          value: "triple"
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-pvc
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+  - port: 3306
+  clusterIP: None  # Headless service for StatefulSet
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springboot
+  template:
+    metadata:
+      labels:
+        app: springboot
+    spec:
+      containers:
+      - name: springboot
+        image: your-dockerhub-username/springboot:latest  # Replace with your image
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: springboot-config
+        - secretRef:
+            name: springboot-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-service
+spec:
+  selector:
+    app: springboot
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: LoadBalancer
