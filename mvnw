@@ -54,4 +54,4 @@ if [ ! -f "$MAVEN_WRAPPER_PROPERTIES" ]; then
   exit 1
 fi
 
-java -cp "$MAVEN_WRAPPER_JAR" "-Dmaven.home=$MAVEN_HOME" "-Dmaven.repo.local=$MAVEN_REPO_LOCAL" org.apache.maven.wrapper.MavenWrapperMain $MAVEN_CMD_LINE_ARGS
+java -cp "$MAVEN_WRAPPER_JAR" "-Dmaven.home=$MAVEN_HOME" "-Dmaven.repo.local=$MAVEN_REPO_LOCAL" "-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR" org.apache.maven.wrapper.MavenWrapperMain $MAVEN_CMD_LINE_ARGS
