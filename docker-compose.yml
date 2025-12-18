@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  springboot:
+    image: pamutalwar/springboot:latest
+    container_name: springboot-container
+    ports:
+      - "8081:8080"  # Use 8081 on host since 8080 is taken
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/triple
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
